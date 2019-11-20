@@ -1,0 +1,7 @@
+---
+
+- name: Dev - Install Packages
+  pkg:
+    name: "{{ daos_dev_pkgs }}"
+    state: "{{ daos_pkg_state }}"
+    

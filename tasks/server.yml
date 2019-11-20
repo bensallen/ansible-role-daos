@@ -1,0 +1,6 @@
+---
+
+- name: Server - Install Packages
+  pkg:
+    name: "{{ daos_server_pkgs }}"
+    state: "{{ daos_pkg_state }}"

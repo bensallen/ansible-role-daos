@@ -1,0 +1,15 @@
+---
+- name: Include client
+  include: tasks/client.yml
+  when: >
+    'client' in daos_roles
+
+- name: Include server
+  include: tasks/server.yml
+  when: >
+    'server' in daos_roles
+    
+- name: Include dev
+  include: tasks/dev.yml
+  when: >
+    'dev' in daos_roles

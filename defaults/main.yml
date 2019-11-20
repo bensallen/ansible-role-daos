@@ -1,0 +1,21 @@
+---
+
+daos_roles:
+  - 'client'
+  - 'server'
+  - 'dev'
+  
+daos_server_pkgs:
+  - daos
+  - daos-client
+  - daos-server
+
+daos_client_pkgs:
+  - daos
+  - daos-client
+
+daos_dev_pkgs:
+  - daos-devel
+  - daos-tests
+
+daos_pkg_state: installed
