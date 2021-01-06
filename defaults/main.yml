@@ -19,3 +19,6 @@ daos_dev_pkgs:
   - daos-tests
 
 daos_pkg_state: installed
+
+daos_sysctl_path: /etc/sysctl.d/95-daos.conf
+daos_sysctl_reload: yes
