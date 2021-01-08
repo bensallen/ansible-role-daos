@@ -9,14 +9,23 @@ daos_server_pkgs:
   - daos
   - daos-client
   - daos-server
+  - hwloc
+  - fuse3
+  - ipmctl
+  - ndctl
+  - nvme-cli
 
 daos_client_pkgs:
   - daos
   - daos-client
+  - fuse3
+  - hwloc
 
 daos_dev_pkgs:
   - daos-devel
   - daos-tests
+  - libyaml-0-2
+  - libndctl6
 
 daos_pkg_state: installed
 
