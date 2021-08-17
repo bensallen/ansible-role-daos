@@ -4,3 +4,13 @@
   package:
     name: "{{ daos_server_pkgs }}"
     state: "{{ daos_pkg_state }}"
+
+- name: Set ext4 allow_unsupported=1
+  copy:
+    dest: /etc/modprobe.d/ext4-allow_unsupported.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      options ext4 allow_unsupported=1
+  when: ansible_os_family == 'Suse'

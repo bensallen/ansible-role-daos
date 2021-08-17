@@ -9,9 +9,11 @@ daos_server_pkgs:
   - daos
   - daos-client
   - daos-server
+  - e2fsprogs
   - hwloc
   - fuse3
   - ipmctl
+  - libaio1
   - ndctl
   - nvme-cli
 
