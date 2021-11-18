@@ -259,7 +259,7 @@ daos_server_config_default:
           # by this engine.
           # Path should be unique to engine instance (can use different subdirs).
           # Either the specified directory or its parent must be a mount point.
-          scm_mount: {{ daos_server_scm_mount_dir }}/0
+          scm_mount: "{{ daos_server_scm_mount_dir }}/0"
 
           # When class is set to dcpm, scm_list is the list of device paths for
           # PMem namespaces (currently only one per engine supported).
@@ -344,7 +344,7 @@ daos_server_config_default:
           # Define a pre-configured mountpoint for storage class memory to be used
           # by this engine.
           # Path should be unique to engine instance (can use different subdirs).
-          scm_mount: {{ daos_server_scm_mount_dir }}/1
+          scm_mount: "{{ daos_server_scm_mount_dir }}/1"
           # When class is set to dcpm, scm_list is the list of device paths for
           # PMem namespaces (currently only one per engine supported).
           scm_list: [/dev/pmem1]
