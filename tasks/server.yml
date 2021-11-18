@@ -15,6 +15,14 @@
     mode: "{{ daos_server_socket_dir_perms }}"
     state: directory
 
+- name: Server - Socket Directory
+  file:
+    path: "{{ daos_server_scm_mount_dir }}"
+    owner: "{{ daos_server_svc_user }}"
+    group: "{{ daos_server_svc_group }}"
+    mode: "{{ daos_server_scm_mount_dir_perms }}"
+    state: directory
+
 - name: Server - Install Packages
   package:
     name: "{{ daos_server_pkgs }}"
