@@ -1,9 +1,42 @@
 ---
+- name: Server - Log Directory
+  file:
+    path: "{{ daos_server_log_dir }}"
+    owner: "{{ daos_server_svc_user }}"
+    group: "{{ daos_server_svc_group }}"
+    mode: "{{ daos_server_log_dir_perms }}"
+    state: directory
+
+- name: Server - Socket Directory
+  file:
+    path: "{{ daos_server_socket_dir }}"
+    owner: "{{ daos_server_svc_user }}"
+    group: "{{ daos_server_svc_group }}"
+    mode: "{{ daos_server_socket_dir_perms }}"
+    state: directory
 
 - name: Server - Install Packages
   package:
     name: "{{ daos_server_pkgs }}"
     state: "{{ daos_pkg_state }}"
+
+- name: Server - Configuration File
+  copy:
+    dest: "{{ daos_server_config_path }}"
+    content: "{{ daos_server_config | to_nice_yaml(indent=2, width=1337) }}"
+    owner: "{{ daos_server_svc_user }}"
+    group: "{{ daos_server_svc_group }}"
+    mode: "0644"
+
+- name: Server - Enable Service on Boot
+  service:
+    name: "{{ daos_server_svc }}"
+    enabled: "{{ daos_server_svc_enabled }}"
+
+- name: Server - Service State
+  service:
+    name: "{{ daos_server_svc }}"
+    state: "{{ daos_server_svc_state }}"
 
 - name: Set ext4 allow_unsupported=1
   copy:
@@ -14,3 +47,26 @@
     content: |
       options ext4 allow_unsupported=1
   when: ansible_os_family == 'Suse'
+
+- block:
+  - name: Disable arp replies on any host interface other than the one on which the arp request arrived
+    sysctl:
+      name: net.ipv4.conf.all.arp_ignore
+      value: "1"
+      sysctl_file: "{{ daos_server_sysctl_path }}"
+      reload: "{{ daos_server_sysctl_reload }}"
+
+  - name: Allow requests from any interface that has a routable reverse path
+    sysctl:
+      name: net.ipv4.conf.all.rp_filter
+      value: "2"
+      sysctl_file: "{{ daos_server_sysctl_path }}"
+      reload: "{{ daos_server_sysctl_reload }}"
+
+  - name: Allow traffic between two interfaces on the same node
+    sysctl:
+      name: net.ipv4.conf.all.accept_local
+      value: "1"
+      sysctl_file: "{{ daos_server_sysctl_path }}"
+      reload: "{{ daos_server_sysctl_reload }}"
+  when: daos_server_multirail|bool

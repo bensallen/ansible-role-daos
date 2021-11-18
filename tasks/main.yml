@@ -14,23 +14,3 @@
   when: >
     'dev' in daos_roles
 
-- name: Disable arp replies on any host interface other than the one on which the arp request arrived
-  sysctl:
-    name: net.ipv4.conf.all.arp_ignore
-    value: "1"
-    sysctl_file: "{{ daos_sysctl_path }}"
-    reload: "{{ daos_sysctl_reload }}"
-
-- name: Allow requests from any interface that has a routable reverse path
-  sysctl:
-    name: net.ipv4.conf.all.rp_filter
-    value: "2"
-    sysctl_file: "{{ daos_sysctl_path }}"
-    reload: "{{ daos_sysctl_reload }}"
-
-- name: Allow traffic between two interfaces on the same node
-  sysctl:
-    name: net.ipv4.conf.all.accept_local
-    value: "1"
-    sysctl_file: "{{ daos_sysctl_path }}"
-    reload: "{{ daos_sysctl_reload }}"

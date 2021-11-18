@@ -4,7 +4,7 @@ daos_roles:
   - 'client'
   - 'server'
   - 'dev'
-  
+
 daos_server_pkgs:
   - daos
   - daos-client
@@ -31,5 +31,327 @@ daos_dev_pkgs:
 
 daos_pkg_state: installed
 
-daos_sysctl_path: /etc/sysctl.d/95-daos.conf
-daos_sysctl_reload: yes
+# Set sysctl's to allow for multirail
+daos_server_multirail: true
+daos_server_sysctl_path: /etc/sysctl.d/95-daos.conf
+daos_server_sysctl_reload: true
+
+daos_server_svc: daos_server
+daos_server_svc_state: started
+daos_server_svc_enabled: true
+
+daos_server_svc_user: daos_server
+daos_server_svc_group: daos_server
+
+# DAOS server configuration file.
+daos_server_config_path: /etc/daos/daos_server.yml
+daos_server_config: "{{ daos_server_config_default }}"
+
+daos_server_log_dir: /var/log/daos
+daos_server_log_dir_perms: '0750'
+
+daos_server_socket_dir: /var/run/daos_server
+daos_server_socket_dir_perms: '0750'
+
+daos_server_config_default:
+
+  # Name associated with the DAOS system.
+  # Immutable after reformat.
+  name: daos_server
+
+  # Access points
+  # To operate, DAOS will need a quorum of access point nodes to be available.
+  # Must have the same value for all agents and servers in a system.
+  # Immutable after reformat.
+  # Hosts can be specified with or without port, default port below
+  # assumed if not specified.
+  access_points: ["{{ansible_hostname}}"]
+
+  # Port number to bind daos_server to, this will also
+  # be used when connecting to access points unless a port is specified.
+  port: 10001
+
+  # Transport Credentials Specifying certificates to secure communications
+  transport_config:
+    # In order to disable transport security, uncomment and set allow_insecure
+    # to true. Not recommended for production configurations.
+    allow_insecure: false
+
+    # Location where daos_server will look for Client certificates
+    client_cert_dir: /etc/daos/tls/clients
+    # Custom CA Root certificate for generated certs
+    ca_cert: /etc/daos/tls/daosCA.crt
+    # Server certificate for use in TLS handshakes
+    cert: /etc/daos/tls/server.crt
+    # Key portion of Server Certificate
+    key: /etc/daos/tls/server.key
+
+
+  # Fault domain path
+  # Immutable after reformat.
+  fault_path: /hostname
+
+
+  # Fault domain callback
+  # Path to executable which will return fault domain string.
+  # Immutable after reformat.
+  # fault_cb: ./.daos/fd_callback
+
+
+  # Use specific network provider
+  # Force a specific provider to be used by all the engines.
+  # The default provider depends on the interfaces that will be auto-detected:
+  #  ofi+verbs;ofi_rxm for Infiniband/RoCE and
+  #  ofi+sockets for non-RDMA-capable Ethernet.
+  # provider: ofi+verbs;ofi_rxm
+
+
+  # Whether to enable share address in the network stack
+  # (also known as scalable endpoint)
+  # parameters shared with client..
+  crt_ctx_share_addr: 0
+
+  # global RPC timeout shared with client
+  crt_timeout: 30
+
+  # NVMe SSD inclusion list
+  # Only use NVMe controllers with specific PCI addresses.
+  # Immutable after reformat, colons replaced by dots in PCI identifiers.
+  # By default, DAOS will use all the NVMe-capable SSDs that don't have active
+  # mount points.
+  # bdev_include: ["0000:81:00.1","0000:81:00.2","0000:81:00.3"]
+
+  # NVMe SSD exclusion list
+
+  # Only use NVMe controllers with specific PCI addresses. Overrides drives
+  # listed in bdev_include and forces auto-detection to skip those drives.
+  # Immutable after reformat, colons replaced by dots in PCI identifiers.
+
+  # bdev_exclude: ["0000:81:00.1"]
+
+  # Disable VFIO Driver
+  # In some circumstances it may be preferable to force SPDK to use the UIO
+  # driver for NVMe device access even though an IOMMU is available. Note
+  # that use of the UIO driver requires that DAOS must run as root.
+  disable_vfio: false
+
+  # Enable VMD Usage
+  # The use of Intel Volume Management Devices can be optionally enabled.
+  # VMD needs to be available and configured in the ##system BIOS before use.
+  enable_vmd: false
+
+  # Enable NVMe SSD Hotplug
+  # When hotplug is enabled, io engine will periodically check device hot
+  # plug/remove event, and setup/teardown the device automatically.
+  enable_hotplug: false
+
+  # Use Hyperthreads
+  # When Hyperthreading is enabled and supported on the system, this parameter
+  # defines whether the DAOS service should try to take advantage of
+  # hyperthreading to scheduling different task on each hardware thread.
+  # Not supported yet.
+  hyperthreads: false
+
+  # Use the given directory for creating unix domain sockets
+  # DAOS Agent and DAOS Server both use unix domain sockets for communication
+  # with other system components. This setting is the base location to place
+  # the sockets in.
+  socket_dir: "{{ daos_server_socket_dir }}"
+
+  # Number of hugepages to allocate for use by NVMe SSDs
+  # Specifies the number (not size) of hugepages to allocate for use by NVMe
+  # through SPDK. This indicates the number to be used for each spawned
+  # I/O Engines, so the total will be this number * number of I/O Engines.
+  # Default system hugepage size will be used.
+  nr_hugepages: 4096
+
+  # Debug mask for daos_server (control plane).
+  # Mask specifies minimum level of message significance to pass to logger.
+  # Currently supported values are DEBUG and ERROR.
+
+  control_log_mask: DEBUG
+
+  # Force specific path for daos_server (control plane) logs.
+  # default: print to stderr
+  # control_log_file: /var/log/daos/daos_server.log
+
+  # Enable daos_admin (privileged helper) logging.
+  # default: disabled (errors only to control plane log)
+  # helper_log_file: /var/log/daos/daos_admin.log
+
+  # Enable daos_firmware (privileged helper) logging.
+
+  # default: disabled (errors only to control plane log)
+  # firmware_helper_log_file: /var/log/daos/daos_firmware.log
+
+  # When per-engine definitions exist, auto-allocation of resources is not
+  # performed. Without per-engine definitions, node resources will
+  # automatically be assigned to engines based on NUMA ratings, there will
+  # be a one-to-one relationship between engines and sockets.
+  engines:
+    # Rank to be assigned as identifier for this engine.
+    # Immutable after reformat.
+    # Optional parameter, will be auto generated if not supplied.
+    - rank: 0
+      # Targets represent the number of I/O service threads (and network endpoints)
+      # to be allocated per engine.
+      # Immutable after reformat.
+      targets: 16
+
+      # Number of additional offload service threads to accelerate checksum
+      # and server-side RPC dispatch per engine.
+      # Immutable after reformat.
+      nr_xs_helpers: 4
+
+      # Pin this engine instance to cores and memory that are related to the
+      # NUMA node ID specified with this value. For best performance, it is
+      # necessary to select a NUMA node that matches that of the fabric_iface.
+      # Optional parameter, set either this option or first_core but not both.
+      pinned_numa_node: 0
+
+      # Offset of the first core to be used for I/O service threads.
+      # Immutable after reformat.
+      # Optional parameter, set either this option or pinned_numa_node but
+      # not both.
+      first_core: 0
+
+      # A boolean that instructs the I/O Engine instance to bypass the NVME
+      # health check.  This eliminates the check and related log output for those
+      # systems with NVME that do not support the device health data query.
+      bypass_health_chk: true
+
+      # Use specific network interface.
+      # Specify the fabric network interface that will be used by this engine.
+      # Optionally specify the fabric network interface port that will be used
+      # by this engine but please only if you have a specific need, this will
+      # normally be chosen automatically.
+      fabric_iface: ib0
+      fabric_iface_port: 20000
+
+      # Force specific debug mask for the engine at start up time.
+      # By default, just use the default debug mask used by DAOS.
+      # Mask specifies minimum level of message significance to pass to logger.
+      log_mask: ERR
+
+      # Force specific path for DAOS debug logs.
+      log_file: /var/log/daos/daos_engine.0.log
+
+      # Pass specific environment variables to the engine process.
+      # Empty by default. Values should be supplied without encapsulating quotes.
+      env_vars:
+        - CRT_TIMEOUT=30
+
+      storage:
+        # Backend SCM device type. Either use PMem (Intel(R) Optane(TM) persistent
+        # memory) modules configured in interleaved mode or emulate SCM with a
+        # tmpfs running in RAM.
+        # Options are:
+        # - "dcpm" for real SCM (preferred option), scm_size ignored
+        # - "ram" to emulate SCM with memory, scm_list ignored
+        # Immutable after reformat.
+        - class: dcpm
+
+          # Define a pre-configured mountpoint for storage class memory to be used
+          # by this engine.
+          # Path should be unique to engine instance (can use different subdirs).
+          # Either the specified directory or its parent must be a mount point.
+          scm_mount: /mnt/daos/1
+
+          # When class is set to ram, tmpfs will be used to emulate SCM.
+          # The size of ram is specified by scm_size in GB units.
+          # scm_size: 16
+
+          # Backend block device type. Force a SPDK driver to be used by this engine
+          # instance.
+          # Options are:
+          # - "nvme" for NVMe SSDs (preferred option), bdev_size ignored
+          # - "file" to emulate a NVMe SSD with a regular file
+          # - "kdev" to use a kernel block device, bdev_size ignored
+          # Immutable after reformat.
+        - class: nvme
+
+          # Backend block device configuration to be used by this engine instance.
+          # When class is set to nvme, bdev_list is the list of unique NVMe IDs
+          # that should be different across different engine instance.
+          # Immutable after reformat.
+          bdev_list: ["0000:81:00.0"]  # generate regular nvme.conf
+
+    # Rank to be assigned as identifier for this engine.
+    # Immutable after reformat.
+    # Optional parameter, will be auto generated if not supplied.
+    - rank: 1
+
+      # Targets represent the number of I/O service threads (and network endpoints)
+      # to be allocated per engine.
+      # Immutable after reformat.
+      targets: 16
+
+      # Number of additional offload service threads to accelerate checksum
+      # and server-side RPC dispatch per engine.
+      # Immutable after reformat.
+      nr_xs_helpers: 4
+
+      # Pin this engine instance to cores and memory that are related to the
+      # NUMA node ID specified with this value. For best performance, it is
+      # necessary to select a NUMA node that matches that of the fabric_iface.
+      # Optional parameter, set either this option or first_core but not both.
+      pinned_numa_node: 1
+
+      # Offset of the first core to be used for I/O service threads.
+      # Immutable after reformat.
+      # Optional parameter, set either this option or pinned_numa_node but
+      # not both.
+      first_core: 22
+
+      # Use specific network interface.
+      # Specify the fabric network interface that will be used by this engine.
+      # Optionally specify the fabric network interface port that will be used
+      # by this engine but please only if you have a specific need, this will
+      # normally be chosen automatically.
+      fabric_iface: ib1
+      fabric_iface_port: 20000
+
+      # Force specific debug mask for the engine at start up time.
+      # By default, just use the default debug mask used by DAOS.
+      # Mask specifies minimum level of message significance to pass to logger.
+      log_mask: ERR
+
+      # Force specific path for DAOS debug logs.
+      log_file: /var/log/daos/daos_engine.1.log
+
+      # Pass specific environment variables to the engine process.
+      # Empty by default. Values should be supplied without encapsulating quotes.
+      env_vars:
+        - CRT_TIMEOUT=100
+
+      storage:
+        # Backend SCM device type. Either use PMem (Intel(R) Optane(TM) persistent
+        # memory) modules configured in interleaved mode or emulate SCM with a
+        # tmpfs running in RAM.
+        # Options are:
+        # - "dcpm" for real SCM (preferred option), scm_size is ignored
+        # - "ram" to emulate SCM with memory, scm_list is ignored
+        # Immutable after reformat.
+        - class: dcpm
+          # Define a pre-configured mountpoint for storage class memory to be used
+          # by this engine.
+          # Path should be unique to engine instance (can use different subdirs).
+          scm_mount: /mnt/daos/2
+          # When class is set to dcpm, scm_list is the list of device paths for
+          # PMem namespaces (currently only one per engine supported).
+          scm_list: [/dev/pmem1]
+
+          # Backend block device type. Force a SPDK driver to be used by this engine
+          # instance.
+          # Options are:
+          # - "nvme" for NVMe SSDs (preferred option), bdev_size ignored
+          # - "file" to emulate a NVMe SSD with a regular file
+          # - "kdev" to use a kernel block device, bdev_size ignored
+          # Immutable after reformat.
+        - class: nvme
+
+          # Backend block device configuration to be used by this engine instance.
+          # When class is set to nvme, bdev_list is the list of unique NVMe IDs
+          # that should be different across different engine instance.
+          # Immutable after reformat.
+          bdev_list: ["0000:8200.0"]  # generate regular nvme.conf
