@@ -39,6 +39,7 @@ daos_server_sysctl_reload: true
 daos_server_svc: daos_server
 daos_server_svc_state: started
 daos_server_svc_enabled: true
+daos_server_svc_allow_state_change: true
 
 daos_server_svc_user: daos_server
 daos_server_svc_group: daos_server

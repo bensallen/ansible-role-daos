@@ -47,6 +47,7 @@
   service:
     name: "{{ daos_server_svc }}"
     state: "{{ daos_server_svc_state }}"
+  when: "{{ daos_server_svc_allow_state_change|bool }}"
 
 - name: Set ext4 allow_unsupported=1
   copy:
