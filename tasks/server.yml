@@ -15,13 +15,15 @@
     mode: "{{ daos_server_socket_dir_perms }}"
     state: directory
 
-- name: Server - Socket Directory
+- name: Server - SCM Directories
   file:
-    path: "{{ daos_server_scm_mount_dir }}"
+    path: "{{ item.1.scm_mount }}"
     owner: "{{ daos_server_svc_user }}"
     group: "{{ daos_server_svc_group }}"
     mode: "{{ daos_server_scm_mount_dir_perms }}"
     state: directory
+  when: "item.1.scm_mount is defined"
+  loop: "{{ daos_server_config.engines|subelements('storage', skip_missing=True) }}"
 
 - name: Server - Install Packages
   package:
