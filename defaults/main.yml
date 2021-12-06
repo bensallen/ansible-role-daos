@@ -35,8 +35,8 @@ daos_pkg_state: installed
 daos_server_multirail: true
 daos_server_sysctl_path: /etc/sysctl.d/95-daos.conf
 daos_server_sysctl_reload: true
-daos_server_sysctl_net_core_rmem_max: 104857
-daos_server_sysctl_net_core_rmem_default: 104857
+daos_server_sysctl_net_core_rmem_max: 1048576
+daos_server_sysctl_net_core_rmem_default: 1048576
 
 daos_server_svc: daos_server
 daos_server_svc_state: started
