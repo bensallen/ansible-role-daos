@@ -81,3 +81,20 @@
       sysctl_file: "{{ daos_server_sysctl_path }}"
       reload: "{{ daos_server_sysctl_reload }}"
   when: daos_server_multirail|bool
+
+
+- name: Set sysctl net.core.rmem_max for PCI event SPDK for hotplug functionality
+  sysctl:
+    name: net.core.rmem_max
+    value: "{{ daos_server_sysctl_net_core_rmem_max }}"
+    sysctl_file: "{{ daos_server_sysctl_path }}"
+    reload: "{{ daos_server_sysctl_reload }}"
+  when: daos_server_sysctl_net_core_rmem_max is defined and daos_server_sysctl_net_core_rmem_max != 0
+
+- name: Set sysctl net.core.rmem_default for PCI event SPDK for hotplug functionality
+  sysctl:
+    name: net.core.rmem_default
+    value: "{{ daos_server_sysctl_net_core_rmem_default }}"
+    sysctl_file: "{{ daos_server_sysctl_path }}"
+    reload: "{{ daos_server_sysctl_reload }}"
+  when: daos_server_sysctl_net_core_rmem_default is defined and daos_server_sysctl_net_core_rmem_default != 0
