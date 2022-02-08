@@ -14,3 +14,7 @@
   when: >
     'dev' in daos_roles
 
+- name: Include debug
+  include: tasks/debug.yml
+  when: >
+    'debug' in daos_roles
