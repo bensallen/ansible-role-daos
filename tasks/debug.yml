@@ -1,0 +1,7 @@
+---
+
+- name: Debug - Install Packages
+  package:
+    name: "{{ daos_debug_pkgs }}"
+    state: "{{ daos_pkg_state }}"
+    

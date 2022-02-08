@@ -4,6 +4,7 @@ daos_roles:
   - 'client'
   - 'server'
   - 'dev'
+  - 'debug'
 
 daos_server_pkgs:
   - daos
@@ -28,6 +29,15 @@ daos_dev_pkgs:
   - daos-tests
   - libyaml-0-2
   - libndctl6
+
+daos_debug_pkgs:
+  - daos-debuginfo
+  - mercury-debuginfo
+  - glibc-debuginfo
+  - libfabric-debuginfo
+  - libpmem1-debuginfo
+  - libpmemobj1-debuginfo
+  - libpmemblk1-debuginfo
 
 daos_pkg_state: installed
 
