@@ -1,0 +1,13 @@
+---
+daos_debug_pkgs:
+  - daos-debuginfo
+  - daos-debugsource
+  - glibc-debuginfo
+  - libfabric-debuginfo
+  - libpmem1-debuginfo
+  - libpmemblk1-debuginfo
+  - libpmemobj1-debuginfo
+  - mercury-debuginfo
+  - mercury-debugsource
+  - pmdk-debuginfo
+  - pmdk-debugsource

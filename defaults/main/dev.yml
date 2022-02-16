@@ -1,0 +1,6 @@
+---
+daos_dev_pkgs:
+  - daos-devel
+  - daos-tests
+  - libyaml-0-2
+  - libndctl6

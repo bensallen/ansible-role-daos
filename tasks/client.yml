@@ -1,6 +1,0 @@
----
-
-- name: Client - Install Packages
-  package:
-    name: "{{ daos_client_pkgs }}"
-    state: "{{ daos_pkg_state }}"

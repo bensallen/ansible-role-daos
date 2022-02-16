@@ -1,8 +1,8 @@
 ---
-- name: Include client
-  include: tasks/client.yml
+- name: Include agent
+  include: tasks/agent.yml
   when: >
-    'client' in daos_roles
+    'agent' in daos_roles
 
 - name: Include server
   include: tasks/server.yml

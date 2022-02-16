@@ -1,0 +1,8 @@
+---
+daos_roles:
+  - 'client'
+  - 'server'
+  - 'dev'
+  - 'debug'
+
+daos_pkg_state: installed
