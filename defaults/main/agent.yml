@@ -1,0 +1,77 @@
+---
+daos_agent_pkgs:
+  - daos
+  - daos-client
+  - fuse3
+  - hwloc
+
+daos_agent_svc: daos_agent
+daos_agent_svc_state: started
+daos_agent_svc_enabled: true
+daos_agent_svc_allow_state_change: true
+
+daos_agent_svc_user: daos_agent
+daos_agent_svc_group: daos_agent
+
+# DAOS agent configuration file.
+daos_agent_config_path: /etc/daos/daos_agent.yml
+daos_agent_config: "{{ daos_agent_config_default }}"
+
+daos_agent_log_dir: /var/log/daos_agent
+daos_agent_log_dir_perms: '0750'
+
+daos_agent_runtime_dir: /var/run/daos_agent
+daos_agent_runtime_dir_perms: '0750'
+
+daos_agent_config_default:
+  # Specify the associated DAOS systems.
+  # Name must match name specified in the daos_server.yml file on the server.
+  #
+  # NOTE: changing the name is not supported yet, it must be daos_server
+  #
+  name: daos_server
+  # Management server access points
+  # Must have the same value for all agents and servers in a system.
+  access_points: ["{{ansible_hostname}}"]
+  # Port number to connect to access points.
+  port: 10001
+  ## Transport Credentials Specifying certificates to secure communications
+  transport_config:
+    # In order to disable transport security, uncomment and set allow_insecure
+    # to true. Not recommended for production configurations.
+    allow_insecure: false
+    # CA Root certificate for generated certs
+    ca_cert: /etc/daos/certs/daosCA.crt
+    # Agent certificate for use in TLS handshakes
+    cert: /etc/daos/certs/agent.crt
+    # Key portion of Agent Certificate
+    key: /etc/daos/certs/agent.key
+  # Use the given directory for creating unix domain sockets
+  runtime_dir: "{{ daos_agent_runtime_dir }}"
+  # Full path and name of the DAOS agent logfile.
+  log_file: "{{ daos_agent_log_dir }}/daos_agent.log"
+  # Manually define the fabric interfaces and domains to be used by the agent,
+  # organized by NUMA node.
+  # If not defined, the agent will automatically detect all fabric interfaces and
+  # select appropriate ones based on the server preferences.
+  #fabric_ifaces:
+  #-
+  #  numa_node: 0
+  #  devices:
+  #  -
+  #    iface: ib0
+  #    domain: mlx5_0
+  #  -
+  #    iface: ib1
+  #    domain: mlx5_1
+  #-
+  #  numa_node: 1
+  #  devices:
+  #  -
+  #    iface: ib2
+  #    domain: mlx5_2
+  #  -
+  #    iface: ib3
+  #    domain: mlx5_3
+
+

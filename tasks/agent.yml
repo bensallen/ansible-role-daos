@@ -1,0 +1,40 @@
+---
+- name: Agent - Log Directory
+  file:
+    path: "{{ daos_agent_log_dir }}"
+    owner: "{{ daos_agent_svc_user }}"
+    group: "{{ daos_agent_svc_group }}"
+    mode: "{{ daos_agent_log_dir_perms }}"
+    state: directory
+
+- name: Agent - Socket Directory
+  file:
+    path: "{{ daos_agent_runtime_dir }}"
+    owner: "{{ daos_agent_svc_user }}"
+    group: "{{ daos_agent_svc_group }}"
+    mode: "{{ daos_agent_runtime_dir_perms }}"
+    state: directory
+
+- name: Agent - Install Packages
+  package:
+    name: "{{ daos_agent_pkgs }}"
+    state: "{{ daos_pkg_state }}"
+
+- name: Agent - Configuration File
+  copy:
+    dest: "{{ daos_agent_config_path }}"
+    content: "{{ daos_agent_config | to_nice_yaml(indent=2, width=1337) }}"
+    owner: "{{ daos_agent_svc_user }}"
+    group: "{{ daos_agent_svc_group }}"
+    mode: "0644"
+
+- name: Agent - Enable Service on Boot
+  service:
+    name: "{{ daos_agent_svc }}"
+    enabled: "{{ daos_agent_svc_enabled }}"
+
+- name: Agent - Service State
+  service:
+    name: "{{ daos_agent_svc }}"
+    state: "{{ daos_agent_svc_state }}"
+  when: daos_agent_svc_allow_state_change|bool
